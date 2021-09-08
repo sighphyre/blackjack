@@ -1,28 +1,29 @@
 from abc import ABC
 from typing import List
 from app.card import Card
+from app.deck import Deck
 
 
 class Hand:
     def __init__(self):
-        List[Card]: self.cards = []
+        self.cards = []
 
     def receive_card(self, card: Card):
-        pass
+        self.cards.append(card)
 
 
 class Player(ABC):
-    pass
+    def draw_card(self, deck: Deck):
+        self.hand.receive_card(deck.draw())
 
 
 class HumanPlayer(Player):
     def __init__(self, name: str):
-        # This may very well be overengineering at this point but in standard BlackJack rules
-        # a player can hold more than one hand through splitting a pair and if I was setting
-        # up a code interview, this is something that I would ask to implement in that interview
-        List[Hand]: self.hands = []
+        self.hand = Hand()
         self.name = name
 
 
 class DealerPlayer(Player):
-    pass
+    def __init__(self):
+        self.hand = Hand()
+        self.name = "Dealer"
