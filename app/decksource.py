@@ -22,4 +22,23 @@ class RestApiDeckSource:
             raise InvalidCardSource("Cannot parse", url, "as a valid url")
 
     def _retrieve_raw_deck_json(self):
-        return requests.get(self.url)
+        deck_response = requests.get(self.url)
+        if deck_response.status_code == 200:
+            return deck_response.json()
+        elif deck_response.status_code == 404:
+            raise InvalidCardSource(
+                "Got a 404 when trying to retrieve cards from deck source"
+            )
+        elif deck_response.status_code == 401:
+            raise InvalidCardSource(
+                "Card source API requires authentication, this is not implemented"
+            )
+        elif deck_response.status_code >= 400 and deck_response.status_code < 500:
+            raise InvalidCardSource(
+                "Status code",
+                deck_response.status_code,
+                "encountered when trying to hit cards",
+            )
+        elif deck_response.status_code >= 500:
+            # Implement backoff
+            pass
