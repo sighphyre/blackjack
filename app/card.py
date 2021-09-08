@@ -1,6 +1,7 @@
 from enum import Enum
 from enum import unique
 from dataclasses import dataclass
+from typing import List
 
 
 @unique
@@ -32,3 +33,23 @@ class Value(Enum):
 class Card:
     suite: Suite
     value: Value
+
+
+class Deck:
+    def __init__(self, cards: List[Card]):
+        self.cards = cards
+        self.__validate_deck(cards)
+
+    def __validate_deck(self, cards):
+        pass
+
+    def draw(self) -> Card:
+        return Card(Suite.Clubs, Value.Ace)
+
+
+class Hand:
+    def __init__(self):
+        self.cards = []
+
+    def receive_card(self, card: Card):
+        self.cards.append(card)
