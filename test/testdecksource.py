@@ -1,10 +1,11 @@
 import unittest
 import responses
 import requests
-from app.decksource import RestApiDeckSource, parse_json_cards
+from app.cardparse import parse_json_cards
+from app.decksource import RestApiDeckSource
 from app.errors import InvalidCardSource
 from app.constants import DEFAULT_DECK_URL
-from app.card import Card, Suite, Value
+from app.card import Card, Suit, Value
 
 MOCK_URL_FOR_CARD_SOURCE = "http://totallynotathing.com"
 
@@ -68,16 +69,24 @@ class TestDeckSource(unittest.TestCase):
         assert deck_result == {"raw": "json"}
 
     @responses.activate
-    def test_given_a_valid_url_that_returns_a_200_range_then_returns_raw_json(self):
+    def test_given_a_valid_url_that_returns_a_200_range_then_returns_list_of_cards(
+        self,
+    ):
 
-        expected_cards = [
-            Card(Suite.Diamonds, Value.Ten),
-            Card(Suite.Clubs, Value.Ten),
-        ]
-        deck_as_json = (
-            """[{"suit":"DIAMONDS","value":"10"},{"suit":"CLUBS","value":"10"}]"""
+        responses.add(
+            responses.GET,
+            MOCK_URL_FOR_CARD_SOURCE,
+            json=[
+                {"suit": "DIAMONDS", "value": "10"},
+                {"suit": "CLUBS", "value": "10"},
+            ],
+            status=200,
         )
+        expected_cards = [
+            Card(Suit.Diamonds, Value.Ten),
+            Card(Suit.Clubs, Value.Ten),
+        ]
 
-        parsed_cards = parse_json_cards(deck_as_json)
+        deck_result = RestApiDeckSource(MOCK_URL_FOR_CARD_SOURCE).load_deck()
 
-        self.assertListEqual(parsed_cards, expected_cards)
+        self.assertListEqual(deck_result.cards, expected_cards)

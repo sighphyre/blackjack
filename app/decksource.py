@@ -1,49 +1,12 @@
 from urllib.parse import urlparse
 from typing import List
-from types import SimpleNamespace
 import requests
 import json
 from app.errors import InvalidCardSource
-from app.card import Card, Suite, Value
+from app.card import Card, Suit, Value, Deck
+from app.cardparse import parse_json_cards
 
 BACKOFF_TIMEOUTS = [1, 3, 5]
-VALUE_MAPPING = {
-    "2": Value.Two,
-    "3": Value.Three,
-    "4": Value.Four,
-    "5": Value.Five,
-    "6": Value.Six,
-    "7": Value.Seven,
-    "8": Value.Eight,
-    "9": Value.Nine,
-    "10": Value.Ten,
-    "J": Value.Jack,
-    "Q": Value.Queen,
-    "K": Value.King,
-    "A": Value.Ace,
-}
-# We could just upper case the enum and resolve it directly with a lookup but this approach provides
-# us with a single point of change if the API decides to change the way suites are presented
-SUITE_MAPPING = {
-    "DIAMONDS": Suite.Diamonds,
-    "SPADES": Suite.Spades,
-    "CLUBS": Suite.Clubs,
-    "HEARTS": Suite.Hearts,
-}
-
-
-def parse_json_cards(json_card_list: str) -> List[Card]:
-    raw_card_values = json.loads(
-        json_card_list, object_hook=lambda d: SimpleNamespace(**d)
-    )
-    validated_cards = map(
-        lambda x: Card(
-            SUITE_MAPPING[x.suit],
-            VALUE_MAPPING[x.value],
-        ),
-        raw_card_values,
-    )
-    return list(validated_cards)
 
 
 class RestApiDeckSource:

@@ -1,11 +1,10 @@
-from enum import Enum
-from enum import unique
+from enum import Enum, unique
 from dataclasses import dataclass
 from typing import List
 
 
 @unique
-class Suite(Enum):
+class Suit(Enum):
     Spades = 1
     Hearts = 2
     Clubs = 3
@@ -31,7 +30,7 @@ class Value(Enum):
 
 @dataclass
 class Card:
-    suite: Suite
+    suit: Suit
     value: Value
 
 
@@ -44,7 +43,7 @@ class Deck:
         pass
 
     def draw(self) -> Card:
-        return Card(Suite.Clubs, Value.Ace)
+        return self.cards.pop(0)
 
 
 class Hand:
